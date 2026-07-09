@@ -1,0 +1,41 @@
+x-backend-image: &backend-image
+  image: backend-dev:latest
+  build:
+    dockerfile: ./Dockerfile
+    context: .
+    target: dev
+    args:
+      USER_NAME: app-data
+      USER_UID: ${RUN_AS_USER:-1000}
+  env_file: ./.env
+  environment:
+    - TZ=UTC
+    - GOPATH=/go
+    - GOCACHE=/go-cache
+    - APP_NAME=web-api
+  volumes:
+    - ./:/app
+  networks:
+    - traefik-4dev_network
+
+services:
+  backend:
+    <<: *backend-image
+    ports:
+      - 3333:3333
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.platform-api.rule=Host(`platform.dev.com`) && PathPrefix(`/api/admin`)
+      - traefik.http.routers.platform-api.entrypoints=websecure
+      - traefik.http.routers.platform-api.tls=true
+
+    command: go run cmd/app.go web
+
+
+networks:
+  traefik-4dev_network:
+    external: true
+
+volumes:
+  go_modules:
+  go_build_cache:

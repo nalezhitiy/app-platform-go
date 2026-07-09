@@ -1,0 +1,22 @@
+# Специфічні файли локальної розробки та автоматизації
+docker-compose.yaml
+docker-compose.*.yaml
+docker-compose.*.yml
+docker-compose.yml
+Dockerfile
+Dockerfile.*
+Makefile
+README.md
+
+# Локальні приховані файли IDE та системи
+.git
+.gitignore
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Кеш та тимчасові файли Go (якщо вони випадково з'являться локально)
+.go-cache/
+bin/
+dist/

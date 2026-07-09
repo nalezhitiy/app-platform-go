@@ -1,0 +1,32 @@
+# --- bin ---
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+
+# test
+*.test
+*.out
+coverage.txt
+
+# JetBrains (GoLand, IntelliJ)
+.idea/
+*.iws
+*.iml
+
+# VS Code
+.vscode/
+
+# --- logs & tmp ---
+*.log
+/tmp/
+
+# --- secrets ---
+.env
+.env.local
+.env.*.local
+
+# --- cache ---
+!.gitignore

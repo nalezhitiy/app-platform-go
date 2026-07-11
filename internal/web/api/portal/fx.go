@@ -1,22 +1,22 @@
 package portal
 
 import (
+	"platform/internal/infrastructure/configs"
 	"platform/internal/web/api/common"
 
 	"go.uber.org/fx"
 )
 
-var routeName = "portal-route"
-
 func InjectDI() fx.Option {
-
 	return fx.Options(
 		fx.Provide(
-			fx.Annotate(
-				NewPortalAPIRouter,
-				fx.ResultTags(`name:"`+routeName+`"`),
-			),
+			NewPortalAPIRouter,
 		),
-		common.InjectDI(routeName),
+		fx.Invoke(
+			func(api PortalAPI, cfg *configs.Config) {
+				common.RegisterHealthcheck(api)
+				common.RegisterVersion(api, cfg)
+			},
+		),
 	)
 }

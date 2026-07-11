@@ -10,12 +10,14 @@ import (
 
 var basePath = "/api/admin"
 
-func NewAdminAPIRouter(router *chi.Mux) web.APIInstance {
+type AdminAPI struct {
+	web.BaseAPI
+}
+
+func NewAdminAPIRouter(router *chi.Mux) AdminAPI {
 	cfg := huma.DefaultConfig("Admin API", "1.0.0")
-	// huma.DocsRendererSwaggerUI
-	// huma.DocsRendererScalar
-	// huma.DocsRendererStoplightElements
-	//cfg.DocsRenderer = huma.DocsRendererStoplightElements
+	cfg.DocsRenderer = huma.DocsRendererStoplightElements
+
 	cfg.Servers = []*huma.Server{
 		{
 			URL:         basePath,
@@ -40,9 +42,9 @@ func NewAdminAPIRouter(router *chi.Mux) web.APIInstance {
 
 	route := router.Route(basePath, func(r chi.Router) {})
 	api := humachi.New(route, cfg)
-	return web.APIInstance{
+	return AdminAPI{BaseAPI: web.BaseAPI{
 		API:      api,
 		Name:     "admin-api",
 		BasePath: basePath,
-	}
+	}}
 }

@@ -1,22 +1,22 @@
 package admin
 
 import (
+	"platform/internal/infrastructure/configs"
 	"platform/internal/web/api/common"
 
 	"go.uber.org/fx"
 )
 
-var routeName = "admin-route"
-
 func InjectDI() fx.Option {
-
 	return fx.Options(
 		fx.Provide(
-			fx.Annotate(
-				NewAdminAPIRouter,
-				fx.ResultTags(`name:"`+routeName+`"`),
-			),
+			NewAdminAPIRouter,
 		),
-		common.InjectDI(routeName),
+		fx.Invoke(
+			func(api AdminAPI, cfg *configs.Config) {
+				common.RegisterHealthcheck(api)
+				common.RegisterVersion(api, cfg)
+			},
+		),
 	)
 }

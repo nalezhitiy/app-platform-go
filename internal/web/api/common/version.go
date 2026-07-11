@@ -20,7 +20,7 @@ type versionResponse struct {
 	Body versionBody `huma:"body, application/json"`
 }
 
-func RegisterVersion(api web.APIInstance, cfg *configs.Config) {
+func RegisterVersion(api web.API, cfg *configs.Config) {
 	huma.Register(api, huma.Operation{
 		OperationID: "version",
 		Summary:     "Application version",
@@ -31,7 +31,7 @@ func RegisterVersion(api web.APIInstance, cfg *configs.Config) {
 
 		return &versionResponse{
 			Body: versionBody{
-				Component: api.Name,
+				Component: api.GetName(),
 				Version:   cfg.App.Version,
 				Commit:    cfg.App.Commit,
 				BuildAt:   cfg.App.BuildAt,

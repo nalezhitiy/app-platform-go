@@ -12,7 +12,7 @@ type plainTextResponse struct {
 	Body string `huma:"body,text/plain"`
 }
 
-func RegisterHealthcheck(api web.APIInstance) {
+func RegisterHealthcheck(api web.API) {
 	desc := huma.Operation{
 		OperationID: "healthcheck",
 		Summary:     "Plain health check",

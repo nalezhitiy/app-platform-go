@@ -10,7 +10,11 @@ import (
 
 var basePath = "/api/portal"
 
-func NewPortalAPIRouter(router *chi.Mux) web.APIInstance {
+type PortalAPI struct {
+	web.BaseAPI
+}
+
+func NewPortalAPIRouter(router *chi.Mux) PortalAPI {
 	cfg := huma.DefaultConfig("Portal API", "1.0.0")
 
 	cfg.Servers = []*huma.Server{
@@ -49,9 +53,9 @@ func NewPortalAPIRouter(router *chi.Mux) web.APIInstance {
 	route := router.Route(basePath, func(r chi.Router) {})
 	api := humachi.New(route, cfg)
 
-	return web.APIInstance{
+	return PortalAPI{web.BaseAPI{
 		API:      api,
 		Name:     "portal-api",
 		BasePath: basePath,
-	}
+	}}
 }

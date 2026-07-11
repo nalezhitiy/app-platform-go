@@ -11,7 +11,8 @@ COLOR_COMMENT = \033[33m
 COLOR_MAGENTA = \033[35m
 
 export RUN_AS_USER=$(shell id -u)
-
+export APP_COMMIT=$(shell git rev-parse --short HEAD)
+export APP_BUILD_AT=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 include .env
 export
 

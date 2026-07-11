@@ -13,6 +13,8 @@ x-backend-image: &backend-image
     - GOPATH=/go
     - GOCACHE=/go-cache
     - APP_NAME=web-api
+    - APP_COMMIT=${APP_COMMIT:-''}
+    - APP_BUILD_AT=${APP_BUILD_AT:-''}
   volumes:
     - ./:/app
   networks:
@@ -25,11 +27,11 @@ services:
       - 3333:3333
     labels:
       - traefik.enable=true
-      - traefik.http.routers.platform-api.rule=Host(`platform.dev.com`) && PathPrefix(`/api/admin`)
+      - traefik.http.routers.platform-api.rule=Host(`platform.dev.com`) #&& PathPrefix(`/api/admin`)
       - traefik.http.routers.platform-api.entrypoints=websecure
       - traefik.http.routers.platform-api.tls=true
 
-    command: go run cmd/app.go web
+    command: go run cmd/app.go web --api all
 
 
 networks:

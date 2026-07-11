@@ -1,16 +1,16 @@
 package admin
 
 import (
+	"platform/internal/web"
+
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 )
 
-type AdminAPI huma.API
-
 var basePath = "/api/admin"
 
-func NewAdminAPIRouter(router *chi.Mux) AdminAPI {
+func NewAdminAPIRouter(router *chi.Mux) web.APIInstance {
 	cfg := huma.DefaultConfig("Admin API", "1.0.0")
 	// huma.DocsRendererSwaggerUI
 	// huma.DocsRendererScalar
@@ -19,24 +19,11 @@ func NewAdminAPIRouter(router *chi.Mux) AdminAPI {
 	cfg.Servers = []*huma.Server{
 		{
 			URL:         basePath,
-			Description: "V0 Development server",
+			Description: "Development server",
 		},
 	}
 
 	cfg.CreateHooks = nil
-
-	cfg.Tags = []*huma.Tag{
-		{
-			Name:        "Users",
-			Description: "User management",
-		},
-		{
-			Name: "Projects",
-		},
-		{
-			Name: "Statistics",
-		},
-	}
 
 	cfg.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
 		"bearer": {
@@ -52,5 +39,10 @@ func NewAdminAPIRouter(router *chi.Mux) AdminAPI {
 	}
 
 	route := router.Route(basePath, func(r chi.Router) {})
-	return humachi.New(route, cfg)
+	api := humachi.New(route, cfg)
+	return web.APIInstance{
+		API:      api,
+		Name:     "admin-api",
+		BasePath: basePath,
+	}
 }

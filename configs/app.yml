@@ -1,5 +1,8 @@
 app:
   name: ${APP_NAME:-platform-api}
+  version: ${APP_VERSION:-1.0.0}
+  commit: ${APP_COMMIT:-""}
+  build_at: ${APP_BUILD_AT:-""}
   env_name: ${APP_ENV:-development}
   debug: ${APP_DEBUG:-false}
   level: ${APP_LOG_LEVEL:-info}

@@ -2,8 +2,11 @@ package configs
 
 type AppConfig struct {
 	EnvName string `yaml:"env_name"`
-	Debug   bool   `yaml:"debug"`
 	Name    string `yaml:"name"`
+	Version string `yaml:"version"`
+	Commit  string `yaml:"commit"`
+	BuildAt string `yaml:"build_at"`
+	Debug   bool   `yaml:"debug"`
 	Level   string `yaml:"level"`
 	Test    string `yaml:"example"`
 }

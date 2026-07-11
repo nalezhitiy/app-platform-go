@@ -2,11 +2,24 @@ package app
 
 import (
 	"platform/internal/web/api/admin"
+	"platform/internal/web/api/portal"
 
 	"go.uber.org/fx"
 )
 
 import "platform/internal/infrastructure/transport/http"
+
+var (
+	AdminModule = fx.Module(
+		"admin-api",
+		admin.InjectDI(),
+	)
+
+	PortalModule = fx.Module(
+		"portal-api",
+		portal.InjectDI(),
+	)
+)
 
 func NewWebAppOptions() fx.Option {
 	return fx.Options(
@@ -17,10 +30,23 @@ func NewWebAppOptions() fx.Option {
 	)
 }
 
-func NewWebAdminApp() *fx.App {
-	AdminModule := fx.Module("admin-api", admin.InjectDI())
+func NewWebAllApp() *fx.App {
 	return fx.New(
 		NewWebAppOptions(),
 		AdminModule,
+		PortalModule,
+	)
+}
+
+func NewWebAdminApp() *fx.App {
+	return fx.New(
+		NewWebAppOptions(),
+		AdminModule,
+	)
+}
+func NewWebPortalApp() *fx.App {
+	return fx.New(
+		NewWebAppOptions(),
+		PortalModule,
 	)
 }

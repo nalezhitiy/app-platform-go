@@ -1,0 +1,4 @@
+jwt:
+  secret: ${APP_JWT_SECRET}
+  expired_access: ${APP_JWT_EXPIRED_ACCESS:300}
+  expired_refresh: ${APP_JWT_EXPIRED_REFRESH:604800}

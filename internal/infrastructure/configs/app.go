@@ -8,7 +8,6 @@ type AppConfig struct {
 	BuildAt string `yaml:"build_at"`
 	Debug   bool   `yaml:"debug"`
 	Level   string `yaml:"level"`
-	Test    string `yaml:"example"`
 }
 
 func (c *AppConfig) IsDevelop() bool {

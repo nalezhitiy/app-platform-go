@@ -6,4 +6,3 @@ app:
   env_name: ${APP_ENV:-development}
   debug: ${APP_DEBUG:-false}
   level: ${APP_LOG_LEVEL:-info}
-  example: "My TEST"

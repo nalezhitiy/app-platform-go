@@ -77,8 +77,8 @@ var showConfigCmd = &cobra.Command{
 func init() {
 	showConfigCmd.Flags().StringVarP(
 		&configType,
-		"type",
-		"t",
+		"section",
+		"s",
 		"",
 		"Filter config output by specific section",
 	)

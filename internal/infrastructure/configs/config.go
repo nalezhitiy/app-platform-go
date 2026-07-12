@@ -13,6 +13,7 @@ import (
 type Config struct {
 	App       AppConfig       `yaml:"app"`
 	WebServer WebServerConfig `yaml:"webserver"`
+	JWT       JWTConfig       `yaml:"jwt"`
 }
 
 func NewConfigs() (*Config, error) {

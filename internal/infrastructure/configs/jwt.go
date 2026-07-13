@@ -1,16 +1,19 @@
 package configs
 
-import "fmt"
+import (
+	"fmt"
+	"platform/internal/utils"
+)
 
 type JWTConfig struct {
-	secret         string `yaml:"secret"`
-	ExpiredAccess  int    `yaml:"expired_access"`
-	ExpiredRefresh int    `yaml:"expired_refresh"`
+	Secret         utils.SecretString `yaml:"secret"`
+	ExpiredAccess  int                `yaml:"expired_access"`
+	ExpiredRefresh int                `yaml:"expired_refresh"`
 }
 
-func (c *JWTConfig) GetSecret() (string, error) {
-	if c.secret == "" {
-		return "", fmt.Errorf("secret is empty")
+func (c *JWTConfig) GetSecret() ([]byte, error) {
+	if c.Secret == "" {
+		return []byte{}, fmt.Errorf("secret is empty")
 	}
-	return c.secret, nil
+	return []byte(c.Secret), nil
 }

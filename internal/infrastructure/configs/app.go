@@ -6,7 +6,6 @@ type AppConfig struct {
 	Version string `yaml:"version"`
 	Commit  string `yaml:"commit"`
 	BuildAt string `yaml:"build_at"`
-	Debug   bool   `yaml:"debug"`
 	Level   string `yaml:"level"`
 }
 

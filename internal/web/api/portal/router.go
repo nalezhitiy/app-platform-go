@@ -54,8 +54,9 @@ func NewPortalAPIRouter(router *chi.Mux) PortalAPI {
 	api := humachi.New(route, cfg)
 
 	return PortalAPI{web.BaseAPI{
-		API:      api,
-		Name:     "portal-api",
-		BasePath: basePath,
+		API:            api,
+		Name:           "portal-api",
+		BasePath:       basePath,
+		AuthCookieName: "session-portal",
 	}}
 }

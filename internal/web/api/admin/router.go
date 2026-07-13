@@ -43,8 +43,9 @@ func NewAdminAPIRouter(router *chi.Mux) AdminAPI {
 	route := router.Route(basePath, func(r chi.Router) {})
 	api := humachi.New(route, cfg)
 	return AdminAPI{BaseAPI: web.BaseAPI{
-		API:      api,
-		Name:     "admin-api",
-		BasePath: basePath,
+		API:            api,
+		Name:           "admin-api",
+		BasePath:       basePath,
+		AuthCookieName: "session-admin",
 	}}
 }

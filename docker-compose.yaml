@@ -33,11 +33,112 @@ services:
 
     command: go run cmd/app.go web --api all
 
+  # ============================================================================
+  # POSTGRESQL (Master + Replica)
+  # ============================================================================
+  postgres-master:
+    image: postgres:17-alpine
+    container_name: platform-postgres-master
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: app
+    ports:
+      - "${CONTAINER_POSTGRES_MASTER_PORT:-5432}:5432"
+    volumes:
+      - pg_master_data:/var/lib/postgresql/data
+    # Використовуємо inline-скрипт, який створює правило і запускає сервер
+    entrypoint: [ "sh", "-c" ]
+    command:
+      - |
+        # Офіційний скрипт ініціалізації бази (створює файли конфігів, якщо папка пуста)
+        docker-entrypoint.sh postgres --version
+        
+        # Додаємо дозвіл на реплікацію в кінець файлу конфігу
+        if [ -f /var/lib/postgresql/data/pg_hba.conf ]; then
+          if ! grep -q "host replication app all md5" /var/lib/postgresql/data/pg_hba.conf; then
+            echo "host replication app all md5" >> /var/lib/postgresql/data/pg_hba.conf
+          fi
+        fi
+        
+        # Запускаємо сервер з потрібними параметрами під правильним юзером
+        exec docker-entrypoint.sh postgres -c wal_level=replica -c max_wal_senders=10 -c max_replication_slots=10
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app -d app" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  postgres-replica:
+    image: postgres:17-alpine
+    container_name: platform-postgres-replica
+    environment:
+      PGPASSWORD: password # Потрібен для pg_basebackup
+    ports:
+      - "${CONTAINER_POSTGRES_REPLICA_PORT:-5433}:5432"
+    volumes:
+      - pg_replica_data:/var/lib/postgresql/data
+    entrypoint: [ "sh", "-c" ]
+    command:
+      - |
+        if [ ! -s /var/lib/postgresql/data/PG_VERSION ]; then
+          echo "Cloning master database for replication..."
+          chown -R postgres:postgres /var/lib/postgresql/data
+          until su-exec postgres pg_basebackup -h postgres-master -U app -D /var/lib/postgresql/data -Fp -Xs -P -R; do
+            echo "Waiting for master to accept replication connections..."
+            sleep 1
+          done
+        fi
+        # Передаємо управління офіційному стартовому скрипту під правильним користувачем
+        exec docker-entrypoint.sh postgres
+    depends_on:
+      postgres-master:
+        condition: service_healthy
+
+  # ============================================================================
+  # MARIADB
+  # ============================================================================
+  mariadb-db:
+    image: mariadb:11.4
+    container_name: platform-mariadb
+    environment:
+      - MARIADB_USER=app
+      - MARIADB_PASSWORD=password
+      - MARIADB_DATABASE=app
+      - MARIADB_ROOT_PASSWORD=root_password
+    ports:
+      - "${CONTAINER_MARIA_DB_PORT:-3306}:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # CLICKHOUSE
+  # ============================================================================
+  clickhouse-db:
+    image: clickhouse/clickhouse-server:24.8-alpine
+    container_name: platform-clickhouse
+    ports:
+      - "${CONTAINER_CLICKHOUSE_DB_INTERFACE_PORT:-8123}:8123" # HTTP інтерфейс
+      - "${CONTAINER_CLICKHOUSE_DB_PORT:-9000}:9000" # Нативний клієнт
+    volumes:
+      - ch_data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   traefik-4dev_network:
     external: true
 
 volumes:
-  go_modules:
-  go_build_cache:
+  pg_master_data:
+  pg_replica_data:
+  mariadb_data:
+  ch_data:

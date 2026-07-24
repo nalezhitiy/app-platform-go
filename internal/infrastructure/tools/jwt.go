@@ -13,7 +13,7 @@ import (
 type JWTPayload struct {
 	Subject     string // user id
 	Issuer      string // "platform" or "admin" or "portal"
-	Audience    string // "access" або "refresh"
+	Audience    string // "access" or "refresh"
 	Role        string // "user" or "admin" or "manager"
 	LastLoginAt *int64
 }
@@ -33,14 +33,13 @@ type JwtService struct {
 
 func NewJwtService(cfg *configs.JWTConfig, logger *zap.Logger) (*JwtService, error) {
 	secret, err := cfg.GetSecret()
-	logger.Info("jwt service initialized", zap.String("secret", string(secret)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize jwt service: %w", err)
 	}
 	return &JwtService{
 		secret:         secret,
-		expiredAccess:  time.Duration(cfg.ExpiredAccess) * time.Second,
-		expiredRefresh: time.Duration(cfg.ExpiredRefresh) * time.Second,
+		expiredAccess:  cfg.ExpiredAccess,
+		expiredRefresh: cfg.ExpiredRefresh,
 		log:            logger,
 	}, nil
 }

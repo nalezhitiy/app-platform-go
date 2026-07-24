@@ -67,11 +67,11 @@ container@logs:
 	docker compose logs -f
 .PHONY: container@logs
 
-## Shell (Backend)
+## EXEC Shell (Backend)
 container@shell-back: container@start
 	docker compose exec backend sh
 .PHONY: container@shell-back
-
+## RUN Shell  (Backend)
 container@run-back:
 	docker compose run --rm backend sh
 .PHONY: container@run-back

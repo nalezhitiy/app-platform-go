@@ -3,12 +3,13 @@ package configs
 import (
 	"fmt"
 	"platform/internal/utils"
+	"time"
 )
 
 type JWTConfig struct {
 	Secret         utils.SecretString `yaml:"secret"`
-	ExpiredAccess  int                `yaml:"expired_access"`
-	ExpiredRefresh int                `yaml:"expired_refresh"`
+	ExpiredAccess  time.Duration      `yaml:"expired_access"`
+	ExpiredRefresh time.Duration      `yaml:"expired_refresh"`
 }
 
 func (c *JWTConfig) GetSecret() ([]byte, error) {

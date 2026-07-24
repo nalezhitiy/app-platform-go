@@ -47,21 +47,17 @@ services:
       - "${CONTAINER_POSTGRES_MASTER_PORT:-5432}:5432"
     volumes:
       - pg_master_data:/var/lib/postgresql/data
-    # Використовуємо inline-скрипт, який створює правило і запускає сервер
     entrypoint: [ "sh", "-c" ]
     command:
       - |
-        # Офіційний скрипт ініціалізації бази (створює файли конфігів, якщо папка пуста)
-        docker-entrypoint.sh postgres --version
+        # Створюємо скрипт з явним абсолютним шляхом до pg_hba.conf
+        mkdir -p /docker-entrypoint-initdb.d
+        cat << 'EOF' > /docker-entrypoint-initdb.d/01-replication.sh
+        #!/bin/sh
+        echo "host replication all all trust" >> /var/lib/postgresql/data/pg_hba.conf
+        EOF
+        chmod +x /docker-entrypoint-initdb.d/01-replication.sh
         
-        # Додаємо дозвіл на реплікацію в кінець файлу конфігу
-        if [ -f /var/lib/postgresql/data/pg_hba.conf ]; then
-          if ! grep -q "host replication app all md5" /var/lib/postgresql/data/pg_hba.conf; then
-            echo "host replication app all md5" >> /var/lib/postgresql/data/pg_hba.conf
-          fi
-        fi
-        
-        # Запускаємо сервер з потрібними параметрами під правильним юзером
         exec docker-entrypoint.sh postgres -c wal_level=replica -c max_wal_senders=10 -c max_replication_slots=10
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U app -d app" ]
@@ -73,7 +69,7 @@ services:
     image: postgres:17-alpine
     container_name: platform-postgres-replica
     environment:
-      PGPASSWORD: password # Потрібен для pg_basebackup
+      PGPASSWORD: password
     ports:
       - "${CONTAINER_POSTGRES_REPLICA_PORT:-5433}:5432"
     volumes:
@@ -83,13 +79,12 @@ services:
       - |
         if [ ! -s /var/lib/postgresql/data/PG_VERSION ]; then
           echo "Cloning master database for replication..."
-          chown -R postgres:postgres /var/lib/postgresql/data
-          until su-exec postgres pg_basebackup -h postgres-master -U app -D /var/lib/postgresql/data -Fp -Xs -P -R; do
+          until pg_basebackup -h postgres-master -U app -D /var/lib/postgresql/data -Fp -Xs -P -R; do
             echo "Waiting for master to accept replication connections..."
-            sleep 1
+            sleep 2
           done
+          echo "Replication initialized successfully."
         fi
-        # Передаємо управління офіційному стартовому скрипту під правильним користувачем
         exec docker-entrypoint.sh postgres
     depends_on:
       postgres-master:

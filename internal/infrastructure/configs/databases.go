@@ -1,21 +1,24 @@
 package configs
 
 import (
+	"gorm.io/gorm"
 	"platform/internal/utils"
 	"time"
 )
 
-type DatabaseRootConfig struct {
-	Database PlatformDBConfig `yaml:"database"`
-}
-
 type PlatformDBConfig struct {
-	Postgres   DatabaseConfig `yaml:"postgres"`
-	MariaDB    DatabaseConfig `yaml:"mariadb"`
-	ClickHouse DatabaseConfig `yaml:"clickhouse"`
+	Postgres   DBConfig `yaml:"postgres"`
+	MariaDB    DBConfig `yaml:"mariadb"`
+	ClickHouse DBConfig `yaml:"clickhouse"`
+}
+type DBConfig struct {
+	DSN        utils.SecretString `yaml:"dsn"`
+	ReplicaDSN utils.SecretString `yaml:"replica_dsn"`
+	Debug      bool               `yaml:"debug"`
+	Pool       PoolConfig         `yaml:"pool"`
+	Orm        OrmConfig          `yaml:"orm"`
 }
 
-// Спільні параметри для пулу та ORM, які ти використовуєш
 type PoolConfig struct {
 	Min      int           `yaml:"min"`
 	Max      int           `yaml:"max"`
@@ -25,14 +28,24 @@ type PoolConfig struct {
 type OrmConfig struct {
 	SkipDefaultTransaction bool `yaml:"skip_default_transaction"`
 	FullSaveAssociations   bool `yaml:"full_save_associations"`
+	PrepareStmt            bool `yaml:"prepare_stmt"`
+	CreateBatchSize        int  `yaml:"create_batch_size"`
+	TranslateError         bool `yaml:"translate_error"`
 }
 
-// ------ Специфічні конфіги для кожної БД ------
+func (c *OrmConfig) ToGorm() *gorm.Config {
+	return &gorm.Config{
+		// configurable from environment / yaml
+		SkipDefaultTransaction: c.SkipDefaultTransaction,
+		FullSaveAssociations:   c.FullSaveAssociations,
+		PrepareStmt:            c.PrepareStmt,
+		CreateBatchSize:        c.CreateBatchSize,
+		TranslateError:         c.TranslateError,
 
-type DatabaseConfig struct {
-	DSN        utils.SecretString `yaml:"dsn"`
-	ReplicaDSN utils.SecretString `yaml:"replica_dsn"`
-	Debug      bool               `yaml:"debug"`
-	Pool       PoolConfig         `yaml:"pool"`
-	Orm        OrmConfig          `yaml:"orm"`
+		// defaults for now
+		DisableNestedTransaction: false,
+		AllowGlobalUpdate:        false,
+		QueryFields:              false,
+		PropagateUnscoped:        false,
+	}
 }

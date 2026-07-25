@@ -1,4 +1,4 @@
-database:
+databases:
   postgres:
     dsn: ${APP_POSTGRES_MASTER_DSN}
     replica_dsn: ${APP_POSTGRES_REPLICA_DSN}
@@ -8,8 +8,11 @@ database:
       max: 25
       lifetime: 900s
     orm:
-      skip_default_transaction: true # Вимикаємо для швидкості, якщо не треба автоматичні транзакції
+      skip_default_transaction: true
       full_save_associations: true
+      prepare_stmt: false
+      create_batch_size: 1000
+      translate_error: true
 
   mariadb:
     dsn: ${APP_MARIADB_DSN}
@@ -19,8 +22,11 @@ database:
       max: 15
       lifetime: 600s
     orm:
-      skip_default_transaction: false
+      skip_default_transaction: true
       full_save_associations: true
+      prepare_stmt: false
+      create_batch_size: 1000
+      translate_error: true
 
   clickhouse:
     dsn: ${APP_CLICKHOUSE_DSN}
@@ -32,3 +38,6 @@ database:
     orm:
       skip_default_transaction: true
       full_save_associations: false
+      prepare_stmt: false
+      create_batch_size: 1000
+      translate_error: true

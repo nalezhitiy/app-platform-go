@@ -1,24 +1,38 @@
 package utils
 
+import "encoding/json"
+
 type SecretString string
 
-var MASKED = "********"
+const Masked = "********"
 
 // Захист від звичайних логів (fmt, zap)
 func (s SecretString) String() string {
-	return MASKED
+	if s == "" {
+		return ""
+	}
+	return Masked
 }
 
 func (s SecretString) GoString() string {
-	return MASKED
+	if s == "" {
+		return ""
+	}
+	return Masked
 }
 
 // Захист від випадкового виведення в JSON API
 func (s SecretString) MarshalJSON() ([]byte, error) {
-	return []byte(MASKED), nil
+	if s == "" {
+		return json.Marshal("")
+	}
+	return json.Marshal(Masked)
 }
 
-// для github.com/goccy/go-yaml, так і для gopkg.in/yaml.v3
+// Працює як для github.com/goccy/go-yaml, так і для gopkg.in/yaml.v3
 func (s SecretString) MarshalYAML() (any, error) {
-	return MASKED, nil
+	if s == "" {
+		return "", nil
+	}
+	return Masked, nil
 }

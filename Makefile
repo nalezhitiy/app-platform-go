@@ -14,6 +14,7 @@ export RUN_AS_USER=$(shell id -u)
 export APP_COMMIT=$(shell git rev-parse --short HEAD)
 export APP_BUILD_AT=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 include .env
+# Експортувати всі змінні Make в оточення всіх дочірніх процесів
 export
 
 guard-%:

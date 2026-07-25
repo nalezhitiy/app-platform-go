@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"platform/internal/infrastructure/configs"
 	"platform/internal/web/api/common"
 	"platform/internal/web/api/common/auth"
 
@@ -14,9 +13,9 @@ func InjectDI() fx.Option {
 			NewAdminAPIRouter,
 		),
 		fx.Invoke(
-			func(api AdminAPI, cfg *configs.Config) {
+			func(api AdminAPI, args common.VersionInputArgs) {
 				common.RegisterHealthcheck(api)
-				common.RegisterVersion(api, cfg)
+				common.RegisterVersion(api, args)
 				auth.RegisterLogin(api)
 			},
 		),

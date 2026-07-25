@@ -17,7 +17,11 @@ x-backend-image: &backend-image
     - APP_BUILD_AT=${APP_BUILD_AT:-''}
   volumes:
     - ./:/app
+  depends_on:
+    postgres-master:
+      condition: service_healthy
   networks:
+    - backend_network
     - traefik-4dev_network
 
 services:
@@ -64,6 +68,8 @@ services:
       interval: 3s
       timeout: 3s
       retries: 5
+    networks:
+      - backend_network
 
   postgres-replica:
     image: postgres:17-alpine
@@ -89,6 +95,8 @@ services:
     depends_on:
       postgres-master:
         condition: service_healthy
+    networks:
+      - backend_network
 
   # ============================================================================
   # MARIADB
@@ -110,6 +118,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - backend_network
 
   # ============================================================================
   # CLICKHOUSE
@@ -117,6 +127,11 @@ services:
   clickhouse-db:
     image: clickhouse/clickhouse-server:24.8-alpine
     container_name: platform-clickhouse
+    environment:
+      CLICKHOUSE_DB: app
+      CLICKHOUSE_USER: app
+      CLICKHOUSE_PASSWORD: password
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     ports:
       - "${CONTAINER_CLICKHOUSE_DB_INTERFACE_PORT:-8123}:8123" # HTTP інтерфейс
       - "${CONTAINER_CLICKHOUSE_DB_PORT:-9000}:9000" # Нативний клієнт
@@ -127,8 +142,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - backend_network
 
 networks:
+  backend_network:
   traefik-4dev_network:
     external: true
 

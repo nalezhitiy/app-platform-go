@@ -4,32 +4,55 @@ import (
 	"context"
 	"net/http"
 	"platform/internal/infrastructure/configs"
+	"platform/internal/usecases"
 	"platform/internal/web"
 
 	"github.com/danielgtaylor/huma/v2"
+	"go.uber.org/fx"
 )
 
-type version struct {
-	Component string `json:"component"`
-	Version   string `json:"version"`
-	Commit    string `json:"commit"`
-	BuildAt   string `json:"build_at"`
+type VersionInputArgs struct {
+	fx.In
+
+	Config           *configs.Config
+	UseCaseVersionDB *usecases.VersionDBUseCase
 }
 
-func RegisterVersion(api web.APIInterface, cfg *configs.Config) {
-	huma.Register(api, huma.Operation{
+type version struct {
+	Component string                     `json:"component"`
+	Version   string                     `json:"version"`
+	Commit    string                     `json:"commit"`
+	BuildAt   string                     `json:"build_at"`
+	Databases []usecases.DatabaseVersion `json:"databases"`
+}
+
+func RegisterVersion(
+	API web.APIInterface,
+	args VersionInputArgs,
+) {
+	huma.Register(API, huma.Operation{
 		OperationID: "version",
 		Summary:     "Application version",
 		Method:      http.MethodGet,
 		Path:        "/version",
 		Tags:        []string{"public"},
 	}, func(ctx context.Context, _ *struct{}) (*web.BaseBodyResponse[version], error) {
+		cfg := args.Config
 
-		return web.NewBaseBodyResponse(version{
-			Component: api.GetName(),
+		v := version{
+			Component: API.GetName(),
 			Version:   cfg.App.Version,
 			Commit:    cfg.App.Commit,
 			BuildAt:   cfg.App.BuildAt,
-		}), nil
+			Databases: make([]usecases.DatabaseVersion, 0),
+		}
+
+		versions, err := args.UseCaseVersionDB.GetVersion()
+		if err != nil {
+			return nil, err
+		}
+		v.Databases = versions
+
+		return web.NewBaseBodyResponse(v), nil
 	})
 }

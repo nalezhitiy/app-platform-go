@@ -1,9 +1,10 @@
 package configs
 
 import (
-	"gorm.io/gorm"
 	"platform/internal/utils"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type PlatformDBConfig struct {
@@ -12,11 +13,11 @@ type PlatformDBConfig struct {
 	ClickHouse DBConfig `yaml:"clickhouse"`
 }
 type DBConfig struct {
-	DSN        utils.SecretString `yaml:"dsn"`
-	ReplicaDSN utils.SecretString `yaml:"replica_dsn"`
-	Debug      bool               `yaml:"debug"`
-	Pool       PoolConfig         `yaml:"pool"`
-	Orm        OrmConfig          `yaml:"orm"`
+	PrimaryDSN utils.SecretString   `yaml:"primary_dsn"`
+	Replicas   []utils.SecretString `yaml:"replicas_dsn"`
+	Debug      bool                 `yaml:"debug"`
+	Pool       PoolConfig           `yaml:"pool"`
+	Orm        OrmConfig            `yaml:"orm"`
 }
 
 type PoolConfig struct {

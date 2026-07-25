@@ -2,8 +2,10 @@ package app
 
 import (
 	"platform/internal/infrastructure/configs"
+	"platform/internal/infrastructure/databases"
 	"platform/internal/infrastructure/logger"
 	"platform/internal/infrastructure/tools"
+	"platform/internal/usecases"
 
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
@@ -13,6 +15,7 @@ import (
 func NewBaseOptions() fx.Option {
 	return fx.Options(
 		configs.Module,
+		databases.InjectDI(),
 		fx.Provide(
 			logger.NewLogger,
 		),
@@ -27,5 +30,7 @@ func NewBaseOptions() fx.Option {
 		}),
 
 		tools.InjectDI(),
+
+		usecases.InjectDI(),
 	)
 }

@@ -1,7 +1,8 @@
 databases:
   postgres:
-    dsn: ${APP_POSTGRES_MASTER_DSN}
-    replica_dsn: ${APP_POSTGRES_REPLICA_DSN}
+    primary_dsn: ${APP_POSTGRES_MASTER_DSN}
+    replicas_dsn:
+      - ${APP_POSTGRES_REPLICA_1_DSN}
     debug: true
     pool:
       min: 5
@@ -15,8 +16,8 @@ databases:
       translate_error: true
 
   mariadb:
-    dsn: ${APP_MARIADB_DSN}
-    debug: false
+    primary_dsn: ${APP_MARIADB_DSN}
+    debug: true
     pool:
       min: 3
       max: 15
@@ -29,8 +30,8 @@ databases:
       translate_error: true
 
   clickhouse:
-    dsn: ${APP_CLICKHOUSE_DSN}
-    debug: false
+    primary_dsn: ${APP_CLICKHOUSE_DSN}
+    debug: true
     pool:
       min: 2
       max: 10
@@ -40,4 +41,4 @@ databases:
       full_save_associations: false
       prepare_stmt: false
       create_batch_size: 1000
-      translate_error: true
+      translate_error: false

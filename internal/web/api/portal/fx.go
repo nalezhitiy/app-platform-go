@@ -1,7 +1,6 @@
 package portal
 
 import (
-	"platform/internal/infrastructure/configs"
 	"platform/internal/web/api/common"
 
 	"go.uber.org/fx"
@@ -13,9 +12,9 @@ func InjectDI() fx.Option {
 			NewPortalAPIRouter,
 		),
 		fx.Invoke(
-			func(api PortalAPI, cfg *configs.Config) {
+			func(api PortalAPI, args common.VersionInputArgs) {
 				common.RegisterHealthcheck(api)
-				common.RegisterVersion(api, cfg)
+				common.RegisterVersion(api, args)
 			},
 		),
 	)

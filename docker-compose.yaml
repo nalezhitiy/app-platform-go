@@ -125,7 +125,7 @@ services:
   # CLICKHOUSE
   # ============================================================================
   clickhouse-db:
-    image: clickhouse/clickhouse-server:24.8-alpine
+    image: clickhouse/clickhouse-server:25.8
     container_name: platform-clickhouse
     environment:
       CLICKHOUSE_DB: app

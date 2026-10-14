@@ -15,10 +15,9 @@ import (
 func NewBaseOptions() fx.Option {
 	return fx.Options(
 		configs.Module,
-		databases.InjectDI(),
-		fx.Provide(
-			logger.NewLogger,
-		),
+		logger.Module,
+		databases.Module,
+
 		fx.WithLogger(func(log *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{
 				Logger: log.With(zap.String("kind", "fx")),
@@ -30,7 +29,6 @@ func NewBaseOptions() fx.Option {
 		}),
 
 		tools.InjectDI(),
-
 		usecases.InjectDI(),
 	)
 }

@@ -2,13 +2,30 @@ package configs
 
 import "go.uber.org/fx"
 
-var Module = fx.Options(
-	fx.Provide(NewConfigs),
+var Module = fx.Module(
+	"configs",
 
 	fx.Provide(
-		func(cfg *Config) *AppConfig { return &cfg.App },
-		func(cfg *Config) *WebServerConfig { return &cfg.WebServer },
-		func(cfg *Config) *JWTConfig { return &cfg.JWT },
-		func(cfg *Config) *PlatformDBConfig { return &cfg.Databases },
+		NewConfigs,
+		NewAppConfig,
+		NewWebServerConfig,
+		NewJWTConfig,
+		NewPlatformDBConfig,
 	),
 )
+
+func NewAppConfig(cfg *Config) *AppConfig {
+	return &cfg.App
+}
+
+func NewWebServerConfig(cfg *Config) *WebServerConfig {
+	return &cfg.WebServer
+}
+
+func NewJWTConfig(cfg *Config) *JWTConfig {
+	return &cfg.JWT
+}
+
+func NewPlatformDBConfig(cfg *Config) *PlatformDBConfig {
+	return &cfg.Databases
+}

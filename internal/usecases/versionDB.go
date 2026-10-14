@@ -11,11 +11,11 @@ type VersionDBUseCase struct {
 	clickhouse *databases.ClickHouseSession
 }
 
-func NewVersionDBUseCase(postgres *databases.PostgresSession, mariadb *databases.MariaDBSession, clickhouse *databases.ClickHouseSession) *VersionDBUseCase {
+func NewVersionDBUseCase(postgres *databases.MainPostgresSession, mariadb *databases.MainMariaDBSession, clickhouse *databases.MainClickhouseSession) *VersionDBUseCase {
 	return &VersionDBUseCase{
-		postgres:   postgres,
-		mariadb:    mariadb,
-		clickhouse: clickhouse,
+		postgres:   postgres.PostgresSession,
+		mariadb:    mariadb.MariaDBSession,
+		clickhouse: clickhouse.ClickHouseSession,
 	}
 }
 

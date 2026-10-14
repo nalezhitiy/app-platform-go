@@ -18,6 +18,7 @@ func InjectDI() fx.Option {
 				common.RegisterVersion(api, args)
 				auth.RegisterLogin(api)
 			},
+			testingCache,
 		),
 	)
 }

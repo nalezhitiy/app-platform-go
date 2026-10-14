@@ -1,6 +1,7 @@
 package app
 
 import (
+	"platform/internal/infrastructure/cache"
 	"platform/internal/infrastructure/configs"
 	"platform/internal/infrastructure/databases"
 	"platform/internal/infrastructure/logger"
@@ -17,6 +18,7 @@ func NewBaseOptions() fx.Option {
 		configs.Module,
 		logger.Module,
 		databases.Module,
+		cache.Module,
 
 		fx.WithLogger(func(log *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{

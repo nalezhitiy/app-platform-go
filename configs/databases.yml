@@ -1,5 +1,7 @@
 databases:
-  postgres:
+  postgres-main:
+    name: postgres-main
+    driver: postgres
     primary_dsn: ${APP_POSTGRES_MASTER_DSN}
     replicas_dsn:
       - ${APP_POSTGRES_REPLICA_1_DSN}
@@ -15,7 +17,9 @@ databases:
       create_batch_size: 1000
       translate_error: true
 
-  mariadb:
+  mariadb-main:
+    name: mariadb-main
+    driver: mysql
     primary_dsn: ${APP_MARIADB_DSN}
     debug: true
     pool:
@@ -29,7 +33,9 @@ databases:
       create_batch_size: 1000
       translate_error: true
 
-  clickhouse:
+  clickhouse-main:
+    name: analyticalDB-main
+    driver: clickhouse
     primary_dsn: ${APP_CLICKHOUSE_DSN}
     debug: true
     pool:

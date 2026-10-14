@@ -1,0 +1,18 @@
+cache:
+  main-redis:
+    name: redis-main
+    driver: redis
+    dsn: ${APP_CACHE_MAIN_DSN}
+    pool:
+      min: 2
+      max: 20
+      lifetime: 300s
+
+  sessions-redis:
+    name: redis-session
+    driver: redis
+    dsn: ${APP_CACHE_SESSIONS_DSN}
+    pool:
+      min: 2
+      max: 10
+      lifetime: 300s

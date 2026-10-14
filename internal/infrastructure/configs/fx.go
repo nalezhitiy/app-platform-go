@@ -11,6 +11,7 @@ var Module = fx.Module(
 		NewWebServerConfig,
 		NewJWTConfig,
 		NewPlatformDBConfig,
+		NewCacheConfig,
 	),
 )
 
@@ -28,4 +29,8 @@ func NewJWTConfig(cfg *Config) *JWTConfig {
 
 func NewPlatformDBConfig(cfg *Config) *PlatformDBConfig {
 	return &cfg.Databases
+}
+
+func NewCacheConfig(cfg *Config) *PlatformCacheConfig {
+	return &cfg.Cache
 }

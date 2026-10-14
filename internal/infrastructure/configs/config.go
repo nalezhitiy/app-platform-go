@@ -11,10 +11,11 @@ import (
 )
 
 type Config struct {
-	App       AppConfig        `yaml:"app"`
-	Databases PlatformDBConfig `yaml:"databases"`
-	WebServer WebServerConfig  `yaml:"webserver"`
-	JWT       JWTConfig        `yaml:"jwt"`
+	App       AppConfig           `yaml:"app"`
+	Databases PlatformDBConfig    `yaml:"databases"`
+	Cache     PlatformCacheConfig `yaml:"cache"`
+	WebServer WebServerConfig     `yaml:"webserver"`
+	JWT       JWTConfig           `yaml:"jwt"`
 }
 
 func NewConfigs() (*Config, error) {

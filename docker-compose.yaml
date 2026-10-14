@@ -7,35 +7,70 @@ x-backend-image: &backend-image
     args:
       USER_NAME: app-data
       USER_UID: ${RUN_AS_USER:-1000}
+
   env_file: ./.env
+
   environment:
     - TZ=UTC
     - GOPATH=/go
+    - GOMODCACHE=/go/pkg/mod
     - GOCACHE=/go-cache
     - APP_NAME=web-api
     - APP_COMMIT=${APP_COMMIT:-''}
     - APP_BUILD_AT=${APP_BUILD_AT:-''}
+
   volumes:
     - ./:/app
+    - go-mod-cache:/go/pkg/mod
+    - go-build-cache:/go-cache
+
   depends_on:
     postgres-master:
       condition: service_healthy
+
   networks:
     - backend_network
     - traefik-4dev_network
 
 services:
-  backend:
+#  backend-web:
+#    <<: *backend-image
+#    ports:
+#      - 3333:3333
+#    labels:
+#      - traefik.enable=true
+#      - traefik.http.routers.platform-api.rule=Host(`platform.dev.com`) #&& PathPrefix(`/api/admin`)
+#      - traefik.http.routers.platform-api.entrypoints=websecure
+#      - traefik.http.routers.platform-api.tls=true
+#
+#    command: ["sh", "-c", "go mod download && exec go run cmd/app.go web --api all"]
+  backend-admin:
     <<: *backend-image
-    ports:
-      - 3333:3333
+    command: [ "sh", "-c", "go mod download && exec go run cmd/app.go web --api admin" ]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.platform-api.rule=Host(`platform.dev.com`) #&& PathPrefix(`/api/admin`)
-      - traefik.http.routers.platform-api.entrypoints=websecure
-      - traefik.http.routers.platform-api.tls=true
+      - traefik.http.routers.platform-admin.rule=Host(`platform.dev.com`) && PathPrefix(`/api/admin`)
+      - traefik.http.routers.platform-admin.entrypoints=websecure
+      - traefik.http.routers.platform-admin.tls=true
+      - traefik.http.services.platform-admin.loadbalancer.server.port=3333
 
-    command: go run cmd/app.go web --api all
+  backend-portal:
+    <<: *backend-image
+    command: [ "sh", "-c", "go mod download && exec go run cmd/app.go web --api portal" ]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.platform-portal.rule=Host(`platform.dev.com`) && PathPrefix(`/api/portal`)
+      - traefik.http.routers.platform-portal.entrypoints=websecure
+      - traefik.http.routers.platform-portal.tls=true
+      - traefik.http.services.platform-portal.loadbalancer.server.port=3333
+
+#  backend-cron:
+#    <<: *backend-image
+#    command: [ "sh", "-c", "go run cmd/app.go cron" ]
+#
+#  backend-workers:
+#    <<: *backend-image
+#    command: [ "sh", "-c", "go run cmd/app.go workers" ]
 
   # ============================================================================
   # POSTGRESQL (Master + Replica)
@@ -145,6 +180,26 @@ services:
     networks:
       - backend_network
 
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD is required}
+    command:
+      - sh
+      - -c
+      - exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning --pass \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - backend_network
+
 networks:
   backend_network:
   traefik-4dev_network:
@@ -155,3 +210,8 @@ volumes:
   pg_replica_data:
   mariadb_data:
   ch_data:
+  redis-data:
+
+  # golang libs cache
+  go-mod-cache:
+  go-build-cache:

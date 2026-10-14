@@ -54,7 +54,6 @@ container@restart: container@stop container@start
 
 ## pull and build container
 container@build:
-	mkdir -p .go/pkg .go/cache
 	RUN_AS_USER=${RUN_AS_USER} docker compose build --no-cache --pull
 .PHONY: container@build
 

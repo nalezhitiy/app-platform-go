@@ -1,18 +1,27 @@
 package configs
 
 import (
+	"fmt"
 	"platform/internal/utils"
 	"time"
 
 	"gorm.io/gorm"
 )
 
-type PlatformDBConfig struct {
-	Postgres   DBConfig `yaml:"postgres"`
-	MariaDB    DBConfig `yaml:"mariadb"`
-	ClickHouse DBConfig `yaml:"clickhouse"`
+type PlatformDBConfig map[string]DBConfig
+
+func (c PlatformDBConfig) Get(name string) (*DBConfig, error) {
+	cfg, ok := c[name]
+	if !ok {
+		return nil, fmt.Errorf("database config %q not found", name)
+	}
+
+	return &cfg, nil
 }
+
 type DBConfig struct {
+	Name       string               `yaml:"name"`
+	Driver     string               `yaml:"driver"`
 	PrimaryDSN utils.SecretString   `yaml:"primary_dsn"`
 	Replicas   []utils.SecretString `yaml:"replicas_dsn"`
 	Debug      bool                 `yaml:"debug"`

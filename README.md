@@ -66,3 +66,16 @@
 │       ├── nats_consumer/      # Обробники топіків NATS JetStream
 │       ├── rabbit_consumer/    # Обробники черг RabbitMQ
 │       └── ws_consumer/        # Обробники потокових повідомлень WebSocket
+```
+
+## Для роботи з мережею використовуй traefik-4dev
+
+https://github.com/nalezhitiy/traefik-4dev
+
+
+## Старт
+```
+cp .env.example .env
+make container@build
+make container@start
+```

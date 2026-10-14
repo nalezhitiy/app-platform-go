@@ -1,6 +1,6 @@
 # --- ГЛОБАЛЬНІ АРГУМЕНТИ ---
 ARG ALPINE_VER=3.24
-ARG GOLANG_VER=1.25.12
+ARG GOLANG_VER=1.27.2
 
 ARG BUILD_ARTIFACT=app
 ARG BUILD_WORKDIR=/build

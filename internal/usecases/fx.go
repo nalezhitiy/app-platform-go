@@ -1,9 +1,16 @@
 package usecases
 
-import "go.uber.org/fx"
+import (
+	"platform/internal/usecases/system"
+
+	"go.uber.org/fx"
+)
 
 func InjectDI() fx.Option {
 	return fx.Options(
-		fx.Provide(NewVersionDBUseCase),
+		fx.Provide(
+			system.NewVersionDBUseCase,
+			system.NewVersionCacheUseCase,
+		),
 	)
 }

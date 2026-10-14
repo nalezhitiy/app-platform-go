@@ -16,11 +16,16 @@ func NewMainPostgresSession(
 	cfg *configs.PlatformDBConfig,
 ) (*MainPostgresSession, error) {
 
+	dbCfg, err := cfg.Get("postgres-main")
+	if err != nil {
+		return nil, err
+	}
+
 	log = log.With(
-		zap.String("database", "main-postgres"),
+		zap.String("database", dbCfg.Name),
 	)
 
-	session, err := NewPostgresSession(log, &cfg.Postgres)
+	session, err := NewPostgresSession(log, dbCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -41,11 +46,16 @@ func NewMainMariaDBSession(
 	cfg *configs.PlatformDBConfig,
 ) (*MainMariaDBSession, error) {
 
+	dbCfg, err := cfg.Get("mariadb-main")
+	if err != nil {
+		return nil, err
+	}
+
 	log = log.With(
-		zap.String("database", "mariadb"),
+		zap.String("database", dbCfg.Name),
 	)
 
-	session, err := NewMariaDBSession(log, &cfg.MariaDB)
+	session, err := NewMariaDBSession(log, dbCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -64,11 +74,16 @@ type MainClickhouseSession struct {
 func NewMainClickhouseSession(log *zap.Logger,
 	cfg *configs.PlatformDBConfig) (*MainClickhouseSession, error) {
 
+	dbCfg, err := cfg.Get("clickhouse-main")
+	if err != nil {
+		return nil, err
+	}
+
 	log = log.With(
-		zap.String("database", "clickhouse"),
+		zap.String("database", dbCfg.Name),
 	)
 
-	session, err := NewClickHouseSession(log, &cfg.ClickHouse)
+	session, err := NewClickHouseSession(log, dbCfg)
 	if err != nil {
 		return nil, err
 	}
